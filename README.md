@@ -5,6 +5,26 @@ Akbar Putra Asenti P. 5025211004
 
 Farrela Ranku Mahhisa 5025211129
 
+
+## Set Up Topologi
+
+Berikut ini pembagian rute subnet yang kami buat
+
+![image](https://github.com/barpeot/Jarkom-Modul-5-D21-2023/assets/114351382/fbdcac9f-a124-47c0-b813-c34fe9600b51)
+
+Kemudian, kita bagi menggunakan VLSM
+
+(gambar tree vlsm)
+
+Dari sini, kita dapatkan pembagian ip seperti pada gambar berikut
+
+![image](https://github.com/barpeot/Jarkom-Modul-5-D21-2023/assets/114351382/ccc6b1fd-209b-46ab-88ba-862da5836b4e)
+
+Setelah itu, kita assign ip berdasarkan pembagian berikut
+
+![image](https://github.com/barpeot/Jarkom-Modul-5-D21-2023/assets/114351382/40a92d69-40bd-44cd-81e1-36c577058026)
+
+
 ## Nomor 1
 
 ```
