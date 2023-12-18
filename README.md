@@ -31,6 +31,18 @@ Setelah itu, kita assign ip berdasarkan pembagian berikut
 iptables -t nat -A POSTROUTING -o eth0 -j SNAT -s 10.32.0.0/20 --to-source 192.168.122.2
 ```
 
+`-t nat` Menentukan tabel yang akan dimanipulasi, dalam hal ini tabel NAT.
+
+`-A POSTROUTING` Menambahkan aturan pada chain POSTROUTING. Chain ini berperan dalam pemrosesan paket setelah melewati routing decision dan sebelum meninggalkan sistem.
+
+` --to-source 192.168.122.2` Menentukan alamat IP yang akan digunakan sebagai alamat sumber baru (setelah dilakukan SNAT). Dalam hal ini, alamat sumber paket akan diubah menjadi 192.168.122.2.
+
+`-o eth0` Menentukan interface keluar yang akan dikenakan aturan, dalam hal ini eth0. Ini berarti aturan ini hanya akan berlaku untuk paket yang akan keluar melalui interface eth0.
+
+`-j SNAT` Menentukan target dari aturan ini, dalam hal ini SNAT (Source NAT). SNAT digunakan untuk mengubah alamat sumber paket.
+
+`-s 10.32.0.0/20` Menentukan range alamat sumber yang akan dikenakan aturan. Aturan ini akan berlaku untuk paket yang berasal dari alamat IP dalam range 10.32.0.0 dengan netmask 20.
+
 ## Nomor 2
 
 ```
@@ -62,8 +74,16 @@ iptables -A INPUT -p icmp -m connlimit --connlimit-above 3 --connlimit-mask 0 -j
 ## Nomor 4
 
 ```
-iptables -A INPUT -p tcp --dport 22 ! -s 10.32.8.0/22 -j REJECT
+iptables -A INPUT -p tcp --dport 22 ! -s 10.32.8.0/22
 ```
+
+`-A INPUT` menambahkan rules pada chain untuk mengecek paket yang masuk
+
+`-p tcp` menggunakan protokol tcp
+
+`--dport 22` rule berlaku pada destination port 22, yaitu default port dari SSH.
+
+`! -s 10.32.8.0/22 -j REJECT` rule berlaku untuk selain subnet 10.32.8.0 dengan netmask 22 maka akan direject
 
 ## Nomor 5
 
@@ -90,21 +110,45 @@ iptables -A INPUT -m time --weekdays 5 --timestart 11:00 --timestop 13:00 -j DRO
 
 ## Nomor 7
 
+Di Heiter (Konfigurasi untuk Sein)
 ```
 iptables -A PREROUTING -t nat -p tcp --dport 80 -d 10.32.8.2 -m statistic --mode nth --every 2 --packet 0 -j DNAT --to-destination 10.32.14.134:80
 iptables -A PREROUTING -t nat -p tcp --dport 80 -d 10.32.8.2 -m statistic --mode nth --every 1 --packet 0 -j DNAT --to-destination 10.32.8.2:80
 ```
 
+`--dport 80` Menentukan port destinasi yang akan dikenakan aturan, yaitu port 80 (HTTP).
+
+`-d 10.32.8.2` Menentukan alamat tujuan yang akan dikenakan aturan, yaitu 10.32.8.2.
+
+`-m statistic --mode nth --every 2 --packet 0` Menggunakan modul statistik untuk melakukan DNAT setiap paket kedua. Ini berarti setiap kedua paket yang menuju ke alamat IP 10.32.8.2 dan port 80 akan diarahkan ke alamat IP 10.32.14.134 dan port 80.
+
+`-m statistic --mode nth --every 1 --packet 0` Sama seperti aturan pertama, hanya berbeda pada parameter --every 1, yang berarti setiap paket pertama yang menuju ke alamat IP 10.32.8.2 dan port 80 akan diarahkan kembali ke alamat IP 10.32.8.2 dan port 80 sendiri.
+
+`-j DNAT --to-destination 10.32.14.134:80` Menentukan target aturan, yaitu DNAT (Destination NAT), dan mengarahkan paket ke alamat tujuan yang baru, yaitu 10.32.14.134 (Stark) dan port 80.
+
+Karena urutan input rule dalam iptables, maka rule yang pertama akan dicek terlebih dahulu, sehingga 
+
+Di Frieren (Konfigurasi untuk Stark)
 ```
-iptables -A PREROUTING -t nat -p tcp --dport 443 -d 10.32.14.134  -m statistic --mode nth --every 2 --packet 0 -j DNAT --to-destination 10.32.8.2:443
-iptables -A PREROUTING -t nat -p tcp --dport 443 -d 10.32.14.134  -m statistic --mode nth --every 1 --packet 0 -j DNAT --to-destination 10.32.14.134:443
+iptables -A PREROUTING -t nat -p tcp --dport 443 -d 10.32.14.134 -m statistic --mode nth --every 2 --packet 0 -j DNAT --to-destination 10.32.8.2:443
+iptables -A PREROUTING -t nat -p tcp --dport 443 -d 10.32.14.134 -m statistic --mode nth --every 1 --packet 0 -j DNAT --to-destination 10.32.14.134:443
 ```
+
+Di Frieren konfigurasinya sama dengan konfigurasi Sein, bedanya menggunakan port 443, yang merupakan default port dari HTTPS.
 
 ## Nomor 8
 
 ```
 iptables -A INPUT -s 10.32.14.144/30  -m time --datestop 2024-3-20 -j DROP
 ```
+
+`-A INPUT` Menambahkan aturan pada chain INPUT, yang berperan dalam pemrosesan paket yang ditujukan ke sistem lokal.
+
+`-s 10.32.14.144/30` Menentukan range alamat sumber yang akan dikenakan aturan. Aturan ini akan berlaku untuk paket-paket yang berasal dari alamat IP dalam range 10.32.14.144 hingga 10.32.14.147 (subnet dengan prefix length /30).
+
+`-m time --datestop 2024-3-20` Menggunakan modul waktu untuk menentukan periode waktu saat aturan ini berlaku. Dalam hal ini, aturan ini akan berlaku hingga tanggal 20 Maret 2024.
+
+`-j DROP` Menentukan tindakan yang akan diambil jika paket memenuhi kriteria aturan. Dalam hal ini, paket-paket yang berasal dari alamat IP dalam range 10.32.14.144/30 akan ditolak (DROP) jika waktu saat ini berada dalam rentang waktu yang ditentukan.
 
 ## Nomor 9
 
