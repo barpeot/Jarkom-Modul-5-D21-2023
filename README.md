@@ -1,4 +1,4 @@
-![image](https://github.com/barpeot/Jarkom-Modul-5-D21-2023/assets/114351382/527afdfb-f32e-4e45-a5cb-b165ba18866b)# Jarkom-Modul-5-D21-2023
+# Jarkom-Modul-5-D21-2023
 
 ## Kelompok D21
 Akbar Putra Asenti P. 5025211004
