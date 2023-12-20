@@ -178,6 +178,7 @@ iptables -A INPUT -j LOG --log-prefix "Paket didrop" --log-level 4
 ```
 
 `iptables -N LOGGING` Membuat chain baru bernama LOGGING
+
 `iptables -A INPUT -j LOGGING` Menambahkan aturan pada chain INPUT untuk mengarahkan paket yang masuk ke chain LOGGING. Artinya, setiap paket yang mencapai chain INPUT akan diarahkan ke chain LOGGING.
 
 `iptables -A OUTPUT -j LOGGING` Menambahkan aturan pada chain OUTPUT untuk mengarahkan paket yang keluar ke chain LOGGING. Ini berarti setiap paket yang keluar akan diarahkan ke chain LOGGING.
