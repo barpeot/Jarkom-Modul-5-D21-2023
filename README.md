@@ -1,4 +1,4 @@
-# Jarkom-Modul-5-D21-2023
+![image](https://github.com/barpeot/Jarkom-Modul-5-D21-2023/assets/114351382/527afdfb-f32e-4e45-a5cb-b165ba18866b)# Jarkom-Modul-5-D21-2023
 
 ## Kelompok D21
 Akbar Putra Asenti P. 5025211004
@@ -153,8 +153,19 @@ iptables -A INPUT -s 10.32.14.144/30  -m time --datestop 2024-3-20 -j DROP
 ## Nomor 9
 
 ```
-
+iptables -N portscan
+iptables -A INPUT -m recent --name portscan --update --seconds 600 --hitcount 20 -j DROP
+iptables -A FORWARD -m recent --name portscan --update --seconds 600 --hitcount 20 -j DROP
+iptables -A INPUT -m recent --name portscan --set -j ACCEPT
+iptables -A FORWARD -m recent --name portscan --set -j ACCEPT
 ```
+
+Jika terdapat lebih dari 20 paket dalam waktu 600 detik (10 menit) menuju port yang sama, paket-paket tersebut akan ditolak (DROP).
+
+Untuk testing sendiri, kita bisa melakukan ping ke Webserver, pada paket ke-21 akan langsung ditolak
+
+![image](https://github.com/barpeot/Jarkom-Modul-5-D21-2023/assets/114351382/82b47d20-295d-449c-9a63-268a780c5e24)
+
 
 ## Nomor 10
 
