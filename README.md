@@ -170,5 +170,27 @@ Untuk testing sendiri, kita bisa melakukan ping ke Webserver, pada paket ke-21 a
 ## Nomor 10
 
 ```
+iptables -N LOGGING
+iptables -A INPUT -j LOGGING
+iptables -A OUTPUT -j LOGGING
+iptables -A LOGGING -m limit --limit 2/min -j LOG --log-prefix "IPTables-Dropped: " --log-level 4
+iptables -A INPUT -j LOG --log-prefix "Paket didrop" --log-level 4
+```
+
+`iptables -N LOGGING` Membuat chain baru bernama LOGGING
+`iptables -A INPUT -j LOGGING` Menambahkan aturan pada chain INPUT untuk mengarahkan paket yang masuk ke chain LOGGING. Artinya, setiap paket yang mencapai chain INPUT akan diarahkan ke chain LOGGING.
+
+`iptables -A OUTPUT -j LOGGING` Menambahkan aturan pada chain OUTPUT untuk mengarahkan paket yang keluar ke chain LOGGING. Ini berarti setiap paket yang keluar akan diarahkan ke chain LOGGING.
+
+`iptables -A LOGGING -m limit --limit 2/min -j LOG --log-prefix "IPTables-Dropped: " --log-level 4` Menambahkan aturan pada chain LOGGING untuk melakukan logging terhadap paket yang melewati chain ini. Aturan ini menggunakan modul limit untuk membatasi jumlah log yang dihasilkan (2 log per menit). Prefix "IPTables-Dropped" ditambahkan ke setiap pesan log, dan level log ditetapkan pada 4 (WARNING).
+
+`iptables -A INPUT -j LOG --log-prefix "Paket didrop" --log-level 4` Menambahkan aturan pada chain INPUT untuk melakukan logging terhadap paket yang ditolak (dropped). Setiap paket yang ditolak akan di-log dengan pesan "Paket didrop" dan level log 4 (WARNING).
 
 ```
+touch /var/log/iptables.log
+echo 'kern.warning      /var/log/iptables.log ' >> /etc/rsyslog.conf
+
+service rsyslog restart
+```
+
+Selanjutnya perlu menambahkan konfigurasi pada file /etc/rsyslog.conf untuk merekam pesan log iptables ke berkas log /var/log/iptables.log kemudian restart layanan rsyslog untuk menerapkan konfigurasi baru.
